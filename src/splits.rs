@@ -67,17 +67,20 @@ struct FileNames<'a> {
 
 impl<'a> FileNames<'a> {
     fn new(prefix: &'a str) -> Self {
-        FileNames { prefix, file_number: 1 }
+        FileNames {
+            prefix,
+            file_number: 1,
+        }
     }
 }
 
 impl Iterator for FileNames<'_> {
     type Item = String;
-    
+
     fn next(&mut self) -> Option<Self::Item> {
         let next_file_name = format!("{}_{}.{}", self.prefix, self.file_number, CSV_EXTENSION);
         self.file_number = self.file_number + 1;
-        
+
         // I suppose we _could_ check for overflow
         Some(next_file_name)
     }

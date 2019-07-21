@@ -16,7 +16,7 @@ pub fn create_matches() -> ArgMatches<'static> {
         .arg(
             Arg::with_name(PREFIX_ARG)
                 .help("Name for the output files.")
-                .default_value("x")
+                .default_value("x"),
         )
         .arg(
             Arg::with_name(LINES_ARG)
@@ -41,10 +41,10 @@ fn get_file_path(file_path_str: &str) -> &Path {
 pub fn parse_matches<'a>(matches: &'a ArgMatches) -> (&'a Path, usize, &'a str) {
     let file_path_str = matches.value_of(FILE_ARG).unwrap(); // is required arg
     let file_path = get_file_path(file_path_str);
-    
+
     let split_at_lines: usize = matches.value_of(LINES_ARG).unwrap().parse().unwrap();
-    
+
     let prefix = matches.value_of(PREFIX_ARG).unwrap(); // has default
-    
+
     (file_path, split_at_lines, prefix)
 }

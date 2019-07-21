@@ -12,17 +12,15 @@ use std::fs;
 fn main() {
     let matches = create_matches();
     let (file_path, split_at_lines, prefix) = parse_matches(&matches);
-    
+
     // TODO: Maybe try a BufReader to see if that's less memory intensive than reading the whole file at once
     let file_string = fs::read_to_string(file_path).unwrap();
 
-    let mut splits = CsvSplits::new(&file_string, split_at_lines, prefix);
-
-//    let first_split = splits.next().unwrap();
-//    dbg!(first_split.0.lines().collect::<Vec<&str>>());
-//    dbg!(first_split.1);
-//
-//    let second_split = splits.next().unwrap();
-//    dbg!(second_split.0.lines().collect::<Vec<&str>>());
-//    dbg!(second_split.1);
+    let splits = CsvSplits::new(&file_string, split_at_lines, prefix);
+    
+    for split in splits {
+        let (file_data_string, file_name_string) = split;
+        let new_path = file_path.with_file_name(file_name_string);
+        fs::write(new_path, file_data_string).unwrap();
+    }
 }
