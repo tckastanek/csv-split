@@ -1,5 +1,5 @@
 extern crate clap;
-use crate::constants::{CSV_EXTENSION, FILE_ARG, LINES_ARG};
+use crate::constants::{CSV_EXTENSION, FILE_ARG, LINES_ARG, PREFIX_ARG};
 use clap::{crate_authors, crate_name, crate_version, App, Arg, ArgMatches};
 use std::path::Path;
 
@@ -12,6 +12,11 @@ pub fn create_matches() -> ArgMatches<'static> {
             Arg::with_name(FILE_ARG)
                 .help("The file to split.")
                 .required(true),
+        )
+        .arg(
+            Arg::with_name(PREFIX_ARG)
+                .help("Name for the output files.")
+                .default_value("x")
         )
         .arg(
             Arg::with_name(LINES_ARG)
@@ -33,9 +38,13 @@ fn get_file_path(file_path_str: &str) -> &Path {
     }
 }
 
-pub fn parse_matches<'a>(matches: &'a ArgMatches) -> (&'a Path, usize) {
+pub fn parse_matches<'a>(matches: &'a ArgMatches) -> (&'a Path, usize, &'a str) {
     let file_path_str = matches.value_of(FILE_ARG).unwrap(); // is required arg
     let file_path = get_file_path(file_path_str);
+    
     let split_at_lines: usize = matches.value_of(LINES_ARG).unwrap().parse().unwrap();
-    (file_path, split_at_lines)
+    
+    let prefix = matches.value_of(PREFIX_ARG).unwrap(); // has default
+    
+    (file_path, split_at_lines, prefix)
 }

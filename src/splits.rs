@@ -5,11 +5,12 @@ pub struct CsvSplits<'a> {
     rem_lines: Lines<'a>,
     headers: &'a str,
     split_at_lines: usize,
+    file_name: FileNames<'a>,
 }
 
 impl<'a> CsvSplits<'a> {
     // TODO: Figure out if we could own this instead and consume the string
-    pub fn new(file_string: &'a String, split_at_lines: usize) -> Self {
+    pub fn new(file_string: &'a String, split_at_lines: usize, prefix: &'a str) -> Self {
         let mut lines = file_string.lines();
         let headers = lines.next().unwrap();
 
@@ -17,12 +18,14 @@ impl<'a> CsvSplits<'a> {
             rem_lines: lines,
             headers,
             split_at_lines,
+            file_name: FileNames::new(prefix),
         }
     }
 }
 
 impl<'a> Iterator for CsvSplits<'_> {
-    type Item = String;
+    // (file_data_string, file_name_string)
+    type Item = (String, String);
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut next_string = String::new();
@@ -47,7 +50,34 @@ impl<'a> Iterator for CsvSplits<'_> {
         if next_string.is_empty() {
             None
         } else {
-            Some(next_string)
+            // only ever returns some...until re run out of usize
+            let file_name_string = self.file_name.next().unwrap();
+            Some((next_string, file_name_string))
         }
+    }
+}
+
+// TODO: Eventually implement the more complex aa, ab, ac pattern `split` uses
+#[derive(Debug)]
+struct FileNames<'a> {
+    prefix: &'a str,
+    file_number: usize,
+}
+
+impl<'a> FileNames<'a> {
+    fn new(prefix: &'a str) -> Self {
+        FileNames { prefix, file_number: 1 }
+    }
+}
+
+impl Iterator for FileNames<'_> {
+    type Item = String;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+        let next_file_name = format!("{}_{}", self.prefix, self.file_number);
+        self.file_number = self.file_number + 1;
+        
+        // I suppose we _could_ check for overflow
+        Some(next_file_name)
     }
 }
