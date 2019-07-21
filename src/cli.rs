@@ -1,6 +1,7 @@
 extern crate clap;
-use crate::constants::{FILE_ARG, LINES_ARG};
+use crate::constants::{CSV_EXTENSION, FILE_ARG, LINES_ARG};
 use clap::{crate_authors, crate_name, crate_version, App, Arg, ArgMatches};
+use std::path::Path;
 
 pub fn create_matches() -> ArgMatches<'static> {
     App::new(crate_name!())
@@ -20,4 +21,21 @@ pub fn create_matches() -> ArgMatches<'static> {
                 .default_value("1000"),
         )
         .get_matches()
+}
+
+fn get_file_path(file_path_str: &str) -> &Path {
+    let file_path = Path::new(file_path_str);
+    let ext = file_path.extension().unwrap();
+    if ext != CSV_EXTENSION {
+        panic!()
+    } else {
+        file_path
+    }
+}
+
+pub fn parse_matches<'a>(matches: &'a ArgMatches) -> (&'a Path, usize) {
+    let file_path_str = matches.value_of(FILE_ARG).unwrap(); // is required arg
+    let file_path = get_file_path(file_path_str);
+    let split_at_lines: usize = matches.value_of(LINES_ARG).unwrap().parse().unwrap();
+    (file_path, split_at_lines)
 }
