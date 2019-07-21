@@ -1,3 +1,4 @@
+use crate::constants::CSV_EXTENSION;
 use std::str::Lines;
 
 #[derive(Debug)]
@@ -74,7 +75,7 @@ impl Iterator for FileNames<'_> {
     type Item = String;
     
     fn next(&mut self) -> Option<Self::Item> {
-        let next_file_name = format!("{}_{}", self.prefix, self.file_number);
+        let next_file_name = format!("{}_{}.{}", self.prefix, self.file_number, CSV_EXTENSION);
         self.file_number = self.file_number + 1;
         
         // I suppose we _could_ check for overflow
